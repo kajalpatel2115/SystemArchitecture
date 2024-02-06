@@ -3,6 +3,7 @@ import java.io.*;
 public class Assembler2 {
 
     public static int index = 0;
+    public static int[][] registers = new int[31][1];
 
     public static void loc(String[] arr, FileWriter output) throws IOException {
         index = Integer.parseInt(arr[2]);
@@ -36,8 +37,16 @@ public class Assembler2 {
     }
 
     public static void LDR(String[] arr, FileWriter output) throws IOException {
-        output.write("000000 000000;\n");
-        System.out.println("000000 000000;");
+        System.out.println("this is what it says " + arr[2]);
+        String[] info = arr[2].split(",");
+        System.out.println("this is what it says " + info[0]);
+        int register = Integer.parseInt(info[0]);
+        registers[register][0] = Integer.parseInt(info[2]);
+
+        String value = Integer.toOctalString(Integer.parseInt(info[2]));
+        String indexstr = Integer.toOctalString(index);
+        output.write("000000       " + value + "\n");
+        System.out.println(indexstr + "      " + value);
     }
 
     public static void LDX(String[] arr, FileWriter output) throws IOException {
