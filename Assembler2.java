@@ -83,7 +83,7 @@ public class Assembler2 {
                     System.out.println("SETCCE");
                     break;
                 default:
-                    System.out.println("Unknown instruction: " + arr[0]);
+                    System.out.println("Unknown instruction: " + arr[1]);
                     break;
             }
         }
