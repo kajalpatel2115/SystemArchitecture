@@ -62,7 +62,7 @@ public class Assembler2 {
 
     public static void main(String[] args) throws IOException {
         // File paths for input and output files respectively
-        File inFile = new File("/home/rachel/SystemArchitecture-2/input.txt");
+        File inFile = new File("./input.txt");
         File outFile = new File("output.txt");
 
         // Creating an object of BufferedReader class
