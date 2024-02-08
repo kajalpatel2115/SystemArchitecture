@@ -1,15 +1,24 @@
 import java.io.*;
+import java.util.*;
+import java.nio.*;
 
 public class Assembler2 {
 
     public static int index = 0;
-    public static int[][] registers = new int[31][1];
+    public static int[][] registers = new int[3][1];
+    public static int CC = 0;
+    public static int location = 0;
 
     public static void loc(String[] arr, FileWriter output) throws IOException {
         index = Integer.parseInt(arr[2]);
         String numstr = Integer.toOctalString(index);
-        output.write(index + "         000000;\n");
-        System.out.println(numstr + "         000000;");
+        location = Integer.parseInt(numstr);
+        
+       /* File inFile = new File("./input.txt");
+        BufferedReader br = new BufferedReader(new FileReader(inFile));
+        String str = "";
+
+        return str;*/
     }
 
     public static void data(String[] arr, FileWriter output) throws IOException {
@@ -22,13 +31,13 @@ public class Assembler2 {
         int numstr = Integer.parseInt(arr[2]);
         String value = Integer.toOctalString(numstr);
         String indexstr = Integer.toOctalString(index);
-        output.write("000000       " + value + "\n");
+        output.write(indexstr + "       " + value + "\n");
         System.out.println(indexstr + "      " + value);
     }
 
-    public static void hlt(FileWriter output) throws IOException {
-        output.write("000000 000000;\n");
-        System.out.println("000000 000000;");
+    public static void HLT(FileWriter output) throws IOException {
+        output.write("002000 000000;\n");
+       // System.out.println("002000 000000;");
     }
 
     public static void TRAP(String[] arr, FileWriter output) throws IOException {
@@ -37,29 +46,50 @@ public class Assembler2 {
     }
 
     public static void LDR(String[] arr, FileWriter output) throws IOException {
-        System.out.println("this is what it says " + arr[2]);
+       // System.out.println("this is what it says " + arr[2]);
         String[] info = arr[2].split(",");
-        System.out.println("this is what it says " + info[0]);
-        int register = Integer.parseInt(info[0]);
+        //System.out.println("this is what it says " + info[0]);
+        int register = Integer.parseInt(info[0]) - 1;
         registers[register][0] = Integer.parseInt(info[2]);
 
         String value = Integer.toOctalString(Integer.parseInt(info[2]));
         String indexstr = Integer.toOctalString(index);
-        output.write("000000       " + value + "\n");
+        output.write(indexstr + "       " + value + "\n");
         System.out.println(indexstr + "      " + value);
     }
 
     public static void LDX(String[] arr, FileWriter output) throws IOException {
-        output.write("000000 000000;\n");
-        System.out.println("000000 000000;");
+       // System.out.println("this is what it says " + arr[2]);
+        String[] info = arr[2].split(",");
+        //System.out.println("this is what it says " + info[0]);
+        int index = Integer.parseInt(info[0]);
+
+        String value = Integer.toOctalString(Integer.parseInt(info[1]));
+        String indexstr = Integer.toOctalString(index);
+        output.write(indexstr + "       " + value + "\n");
+        System.out.println(indexstr + "      " + value);
     }
 
     public static void SETCCE(String[] arr, FileWriter output) throws IOException {
-        output.write("000000 000000;\n");
-        System.out.println("000000 000000;");
+        if(CC == 0)
+        {
+            CC = 1;
+        }
+        else
+        {
+            CC = 0;
+        }
+        String value = Integer.toOctalString(Integer.parseInt(arr[2]));
+        String indexstr = Integer.toOctalString(index);
+        output.write(indexstr + "       " + value + "\n");
+        System.out.println(indexstr + "      " + value);
     }
 
     public static void JZ(String[] arr, FileWriter output) throws IOException {
+        if(CC == 1)
+        {
+            System.out.println("need to jump");
+        }
         output.write("000000 000000;\n");
         System.out.println("000000 000000;");
     }
@@ -69,6 +99,7 @@ public class Assembler2 {
         System.out.println("000000 000000;");
     }
 
+    //printing statements are commented out they are use to double check information processing correctly 
     public static void main(String[] args) throws IOException {
         // File paths for input and output files respectively
         File inFile = new File("./input.txt");
@@ -87,11 +118,12 @@ public class Assembler2 {
 
         while ((str = br.readLine()) != null) {
             // manual checks
-           // System.out.println(str);
-           // System.out.println(str.split("\\s+"));
+            System.out.println(str);
+            //System.out.println(str.split("\\s+"));
 
             String[] arr = str.split("\\s+");
-            System.out.println(arr.length);
+            //System.out.println(arr[2]);
+           
             switch (arr[1]) {
                 case "LOC":
                     loc(arr, output);
@@ -106,8 +138,8 @@ public class Assembler2 {
                     TRAP(arr, output);
                     break;
                 case "HLT":
-                    System.out.println("halt");
-                    break;
+                    HLT(output);
+                    return;
                 case "LDX":
                     System.out.println("LDX");
                     LDX(arr, output);
