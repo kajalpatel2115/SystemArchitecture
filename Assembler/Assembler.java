@@ -21,18 +21,36 @@ public class Assembler {
 	
 	//Index variable 
 	public static int index = 0;
+	//Stat if a halt has been presented or not
+	public static boolean cont = true;
 	
 	//Method for the LOC instruction
     public static void loc(String[] arr, FileWriter output){
         index = Integer.parseInt(arr[1]);
         String numstr = Integer.toOctalString(index);
         //output.write(index+"         000000;%n");
+        
+        
+        String indexstr = Integer.toOctalString(index);
+        //output.write("000000       "+value+"%n");
+        int indexZero = 6 - indexstr.length();
+        
+        
+        try {
+			output.write("0".repeat(indexZero)+indexstr+"      "+ "0".repeat(6)+"\n");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
     }
     
     //Method for Data instruction
      public static void data(String[] arr, FileWriter output){
-        int numstr = Integer.parseInt(arr[1]);
+    	 int numstr = 1024;
+    	 if (arr[1].equals("End") == false) {
+    		numstr = Integer.parseInt(arr[1]);
+    	}
         String value = Integer.toOctalString(numstr);
         String indexstr = Integer.toOctalString(index);
         //output.write("000000       "+value+"%n");
@@ -53,7 +71,7 @@ public class Assembler {
     public static void hlt(FileWriter output){
         //output.write("000000 000000;%n");
     	try {
-			output.write("000000 000000;\n");
+			output.write("000000      000000;\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -63,6 +81,7 @@ public class Assembler {
 
   //Method for data instructions with up to 4 parameters
     public static void method_one(String[] arr, int opcode, FileWriter output){
+    	System.out.println(arr[0]);
         String [] para = arr[1].split(",");
         int r = Integer.parseInt(para[0]);
         int ix = Integer.parseInt(para[1]);
@@ -225,14 +244,12 @@ public class Assembler {
         loadStore.put("STR", "02");
         loadStore.put("LDA", "03");
         loadStore.put("STR", "02");
-        loadStore.put("JNE", "07");
         loadStore.put("JCC", "10");
         loadStore.put("SOB", "14");
         loadStore.put("JGE", "15");
-        loadStore.put("AMR", "16");
-        loadStore.put("SMR", "17");
         //Instructions for three parameters
         loadStore.put("JZ", "06");
+        loadStore.put("JNE", "07");
         loadStore.put("JMA", "11");
         loadStore.put("JSR", "12");
         loadStore.put("LDX", "04");
@@ -274,8 +291,9 @@ public class Assembler {
         floating.put("STFR", "43");
 
         //File paths for input and output files respectively 
-        File inFile = new File(System.getProperty("user.dir") + "/"+ "input.txt");
-        File outFile = new File(System.getProperty("user.dir") + "/"+"output.txt");
+        //Ingests the input file 
+        File inFile = new File(args[0]);
+        File outFile = new File(args[1]);
         
         //Object for Arithmetic and Logical instruction 
         ArithLog arithlog = new ArithLog();
@@ -291,20 +309,18 @@ public class Assembler {
    
 
         //output.write("000000 000000;%n");
-        output.write("000000      000000;\n");
+        //output.write("000000      000000;\n");
 
         String str;
 
         
         //Loop through the lines of an input file
         while ((str = br.readLine()) != null){
-            String [] arr = str.split("\\s+");
-            
-            //If the index is larger than 1024, and error is pushed 
-            if(index > 1024) {
-            	System.out.println("Error!");
-            	break;
-            }
+        	str = str.replace("End:", "");
+        	str = str.trim();
+        	//System.out.println(str);
+        	String [] arr = str.split("\\s+");
+        	
             
             switch(arr[0]){
                 case "LOC":
@@ -317,12 +333,20 @@ public class Assembler {
                 case "RFS":
                     rfs(arr, Integer.parseInt("13", 8), output);
                     index = index + 1;
+                    break;
                 case "SETCCE":
                     setcce(arr, Integer.parseInt("44", 8), output);
                     index = index + 1;
+                    break;
                 case "TRAP":
                 	trap(arr, Integer.parseInt("45", 8), output);
-                    index = index + 1;
+                	index = index + 1;
+                    break;
+                case "HLT":
+                	hlt(output);
+                	index = 0;
+                	System.out.println("Code Ran!");
+                	break;
                 default:
                     break;
                 
@@ -331,7 +355,7 @@ public class Assembler {
             if (loadStore.get(arr[0]) != null){
                 String op = loadStore.get(arr[0]);
                 //Load/Store instructions with at most 4 parameters 
-                if(op == "06" || op == "11" || op == "12" || op == "04" || op == "05"){
+                if(op == "06" || op == "11" || op == "12" || op == "04" || op == "05" || op == "07"){
                    method_two(arr, Integer.parseInt(op,8), output); 
                    index = index + 1;
                 } else {
@@ -374,9 +398,14 @@ public class Assembler {
             	String op = floating.get(arr[0]);
             	inputOut.floating_point(arr, Integer.parseInt(op, 8), output, index);
             	index = index + 1;
-            	}
-                    
             }
+            
+            //If the index is larger than 1024, and error is pushed 
+            if(index > 1024) {
+            	//System.out.println("Error!");
+            	
+            }  
+          }
           output.close();
         }
     }
