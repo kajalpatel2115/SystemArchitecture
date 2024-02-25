@@ -11,8 +11,9 @@ import javax.swing.*;
 public class Simulator extends Frame {
 	
 	public static JButton run, STEP, HLT, load, store, octInput, IPL;
-	public static JButton GR0,GR1,GR2,GR3,XR1,XR2,XR3,PC,MRA,MRB;
+	public static JButton GR0,GR1,GR2,GR3,XR1,XR2,XR3,PCbutton,MRA,MRB;
 	public static FileReader output;
+	public static int PC;
 	
 	  public Simulator(){
 		  
@@ -82,7 +83,7 @@ public class Simulator extends Frame {
 	    GR0 = new JButton("GR0");
 	    GR0.setBounds(50, 50, 50, 50);
 	    GR0.setBackground(Color.WHITE);
-	    GR0.addActionListener(e -> GPRprocess(GRegister0.getText()));
+	    GR0.addActionListener(e -> GPRprocess(GRegister0.getText(), 0));
 	    panel2.add(GRegister0);
 	    panel2.add(GR0);
 	    JTextField GRegister1 = new JTextField(8);
@@ -90,7 +91,7 @@ public class Simulator extends Frame {
 	    GR1 = new JButton("GR1");
 	    GR1.setBounds(50, 50, 50, 50);
 	    GR1.setBackground(Color.WHITE);
-	    GR1.addActionListener(e -> GPRprocess(GRegister1.getText()));
+	    GR1.addActionListener(e -> GPRprocess(GRegister1.getText(), 1));
 	    panel2.add(GRegister1);
 	    panel2.add(GR1);
 	    JTextField GRegister2 = new JTextField(8);
@@ -98,7 +99,7 @@ public class Simulator extends Frame {
 	    GR2 = new JButton("GR2");
 	    GR2.setBounds(50, 50, 50, 50);
 	    GR2.setBackground(Color.WHITE);
-	    GR2.addActionListener(e -> GPRprocess(GRegister2.getText()));
+	    GR2.addActionListener(e -> GPRprocess(GRegister2.getText(), 2));
 	    panel2.add(GRegister2);
 	    panel2.add(GR2);
 	    JTextField GRegister3 = new JTextField(8);
@@ -106,7 +107,7 @@ public class Simulator extends Frame {
 	    GR3 = new JButton("GR3");
 	    GR3.setBounds(50, 50, 50, 50);
 	    GR3.setBackground(Color.WHITE);
-	    GR3.addActionListener(e -> GPRprocess(GRegister3.getText()));
+	    GR3.addActionListener(e -> GPRprocess(GRegister3.getText(), 3));
 	    panel2.add(GRegister3);
 	    panel2.add(GR3);
 	    
@@ -115,7 +116,7 @@ public class Simulator extends Frame {
 	    XR1 = new JButton("XR1");
 	    XR1.setBounds(50, 50, 50, 50);
 	    XR1.setBackground(Color.WHITE);
-	    XR1.addActionListener(e -> XRprocess(XRegister1.getText()));
+	    XR1.addActionListener(e -> XRprocess(XRegister1.getText(), 1));
 	    panel2.add(XRegister1);
 	    panel2.add(XR1);
 	    JTextField XRegister2 = new JTextField(8);
@@ -123,7 +124,7 @@ public class Simulator extends Frame {
 	    XR2 = new JButton("XR2");
 	    XR2.setBounds(50, 50, 50, 50);
 	    XR2.setBackground(Color.WHITE);
-	    XR2.addActionListener(e -> XRprocess(XRegister2.getText()));
+	    XR2.addActionListener(e -> XRprocess(XRegister2.getText(), 2));
 	    panel2.add(XRegister2);
 	    panel2.add(XR2);
 	    JTextField XRegister3 = new JTextField(8);
@@ -131,10 +132,35 @@ public class Simulator extends Frame {
 	    XR3 = new JButton("XR3");
 	    XR3.setBounds(50, 50, 50, 50);
 	    XR3.setBackground(Color.WHITE);
-	    XR3.addActionListener(e -> XRprocess(XRegister3.getText()));
+	    XR3.addActionListener(e -> XRprocess(XRegister3.getText(), 3));
 	    panel2.add(XRegister3);
 	    panel2.add(XR3);
 	    
+	    JTextField PCinput = new JTextField(8);
+	    PCinput.setBackground(Color.WHITE);
+	    PCbutton = new JButton("PC");
+	    PCbutton.setBounds(50, 50, 50, 50);
+	    PCbutton.setBackground(Color.WHITE);
+	    PCbutton.addActionListener(e -> PCload());
+	    panel2.add(PCinput);
+	    panel2.add(PCbutton);
+	    
+	    JTextField MRAinput = new JTextField(8);
+	    MRAinput.setBackground(Color.WHITE);
+	    MRA = new JButton("MRA");
+	    MRA.setBounds(50, 50, 50, 50);
+	    MRA.setBackground(Color.WHITE);
+	    MRA.addActionListener(e -> MRAload(MRAinput.getText()));
+	    panel2.add(MRAinput);
+	    panel2.add(MRA);
+	    JTextField MRBinput = new JTextField(8);
+	    MRBinput.setBackground(Color.WHITE);
+	    MRB = new JButton("MRB");
+	    MRB.setBounds(50, 50, 50, 50);
+	    MRB.setBackground(Color.WHITE);
+	    MRB.addActionListener(e -> MRBload(MRBinput.getText()));
+	    panel2.add(MRBinput);
+	    panel2.add(MRB);
 	    
 	    
 	  }
@@ -146,6 +172,24 @@ public class Simulator extends Frame {
 	  public static void IPLaction()
 	  {
 		  System.out.println("IDK");
+	  }
+	  
+	  public static void PCload()
+	  {
+		  PC++;
+		  System.out.println("PC: " + PC);
+	  }
+	  
+	  public static void MRAload(String input)
+	  {
+		  int in = Integer.parseInt(input);
+		  System.out.println("MRA: " + in);
+	  }
+	  
+	  public static void MRBload(String input)
+	  {
+		  int in = Integer.parseInt(input);
+		  System.out.println("MRB: " + in);
 	  }
 	  
 	  public static void runAssembler() throws IOException
@@ -181,13 +225,13 @@ public class Simulator extends Frame {
 		  System.out.println("store");
 	  }
 	  
-	  public static void GPRprocess(String input)
+	  public static void GPRprocess(String input, int register)
 	  {
 		  int in = Integer.parseInt(input);
 		  System.out.println("GRPprocess: " + in);
 	  }
 	  
-	  public static void XRprocess(String input)
+	  public static void XRprocess(String input, int register)
 	  {
 		  int in = Integer.parseInt(input);
 		  System.out.println("XRPprocess: " + in);
