@@ -17,7 +17,11 @@ public class Simulator extends Frame {
 	public static int PC;
 	public Compution compute;
 	
+	
 	  public Simulator(){
+		  ActionListener actionListener;
+		  
+		  
 		  
 		  JFrame frame = new JFrame("CSCI6461 Front Panel");
 		  frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -73,7 +77,14 @@ public class Simulator extends Frame {
 	    panel.add(octNum);
 	    panel.add(input);
 	    panel.add(octInput);
-	    octInput.addActionListener(e -> processInput(input.getText()));
+	    
+	    
+	    JLabel binIn = new JLabel("Binary");
+	    JTextField binInput = new JTextField(8);
+	    binInput.setPreferredSize(new Dimension(100, 20));
+	    panel.add(binIn);
+	    panel.add(binInput);
+	    
 	    
 	    IPL = new JButton("IPL");
 	    IPL.addActionListener(e -> IPLaction());
@@ -85,7 +96,7 @@ public class Simulator extends Frame {
 	    GR0 = new JButton("GR0");
 	    GR0.setBounds(50, 50, 50, 50);
 	    GR0.setBackground(Color.WHITE);
-	    GR0.addActionListener(e -> GPRprocess(GRegister0.getText(), 0));
+	    
 	    panel2.add(GRegister0);
 	    panel2.add(GR0);
 	    JTextField GRegister1 = new JTextField(8);
@@ -93,7 +104,7 @@ public class Simulator extends Frame {
 	    GR1 = new JButton("GR1");
 	    GR1.setBounds(50, 50, 50, 50);
 	    GR1.setBackground(Color.WHITE);
-	    GR1.addActionListener(e -> GPRprocess(GRegister1.getText(), 1));
+	    
 	    panel2.add(GRegister1);
 	    panel2.add(GR1);
 	    JTextField GRegister2 = new JTextField(8);
@@ -101,7 +112,7 @@ public class Simulator extends Frame {
 	    GR2 = new JButton("GR2");
 	    GR2.setBounds(50, 50, 50, 50);
 	    GR2.setBackground(Color.WHITE);
-	    GR2.addActionListener(e -> GPRprocess(GRegister2.getText(), 2));
+	    
 	    panel2.add(GRegister2);
 	    panel2.add(GR2);
 	    JTextField GRegister3 = new JTextField(8);
@@ -109,7 +120,7 @@ public class Simulator extends Frame {
 	    GR3 = new JButton("GR3");
 	    GR3.setBounds(50, 50, 50, 50);
 	    GR3.setBackground(Color.WHITE);
-	    GR3.addActionListener(e -> GPRprocess(GRegister3.getText(), 3));
+	    
 	    panel2.add(GRegister3);
 	    panel2.add(GR3);
 	    
@@ -118,7 +129,7 @@ public class Simulator extends Frame {
 	    XR1 = new JButton("XR1");
 	    XR1.setBounds(50, 50, 50, 50);
 	    XR1.setBackground(Color.WHITE);
-	    XR1.addActionListener(e -> XRprocess(XRegister1.getText(), 1));
+	    
 	    panel2.add(XRegister1);
 	    panel2.add(XR1);
 	    JTextField XRegister2 = new JTextField(8);
@@ -126,7 +137,7 @@ public class Simulator extends Frame {
 	    XR2 = new JButton("XR2");
 	    XR2.setBounds(50, 50, 50, 50);
 	    XR2.setBackground(Color.WHITE);
-	    XR2.addActionListener(e -> XRprocess(XRegister2.getText(), 2));
+	    
 	    panel2.add(XRegister2);
 	    panel2.add(XR2);
 	    JTextField XRegister3 = new JTextField(8);
@@ -134,7 +145,7 @@ public class Simulator extends Frame {
 	    XR3 = new JButton("XR3");
 	    XR3.setBounds(50, 50, 50, 50);
 	    XR3.setBackground(Color.WHITE);
-	    XR3.addActionListener(e -> XRprocess(XRegister3.getText(), 3));
+	    
 	    panel2.add(XRegister3);
 	    panel2.add(XR3);
 	    
@@ -143,7 +154,7 @@ public class Simulator extends Frame {
 	    PCbutton = new JButton("PC");
 	    PCbutton.setBounds(50, 50, 50, 50);
 	    PCbutton.setBackground(Color.WHITE);
-	    PCbutton.addActionListener(e -> PCload());
+	    
 	    panel2.add(PCinput);
 	    panel2.add(PCbutton);
 	    
@@ -152,7 +163,7 @@ public class Simulator extends Frame {
 	    MRA = new JButton("MRA");
 	    MRA.setBounds(50, 50, 50, 50);
 	    MRA.setBackground(Color.WHITE);
-	    MRA.addActionListener(e -> MRAload(MRAinput.getText()));
+	    
 	    panel2.add(MRAinput);
 	    panel2.add(MRA);
 	    JTextField MRBinput = new JTextField(8);
@@ -160,9 +171,81 @@ public class Simulator extends Frame {
 	    MRB = new JButton("MRB");
 	    MRB.setBounds(50, 50, 50, 50);
 	    MRB.setBackground(Color.WHITE);
-	    MRB.addActionListener(e -> MRBload(MRBinput.getText()));
+	    
 	    panel2.add(MRBinput);
 	    panel2.add(MRB);
+	    
+	    actionListener = new ActionListener() {
+	    	@Override
+	        public void actionPerformed(ActionEvent ae) {
+	           Object obj = ae.getSource();
+	           String value = binInput.getText();
+	           
+	           if(obj == MRB) {
+	        	   MRBinput.setText(value);
+	           }
+	           else if(obj == MRA) {
+	        	   MRAinput.setText(value);
+	           }
+	           else if(obj == PCbutton) {
+	        	   PCinput.setText(value);
+	           }
+	           else if (obj == XR1) {
+	        	   XRegister1.setText(value);
+	           }
+	           else if (obj == XR2) {
+	        	   XRegister2.setText(value);
+	           }
+	           else if (obj == XR3) {
+	        	   XRegister3.setText(value);
+	           }
+	           else if (obj == GR0) {
+	        	   GRegister0.setText(value);
+	           }
+	           else if (obj == GR1) {
+	        	   GRegister1.setText(value);
+	           }
+	           else if (obj == GR2) {
+	        	   GRegister2.setText(value);
+	           }
+	           else if (obj == GR3) {
+	        	   GRegister3.setText(value);
+	           }
+	           else if (obj == PCbutton) {
+	        	   PCinput.setText(value);
+	           } else {
+	        	   System.out.println("Didn't Work");
+	           }
+	           
+	        }
+	    };
+	    
+	    octInput.addActionListener(actionListener);
+	    GR0.addActionListener(actionListener);
+	    GR1.addActionListener(actionListener);
+	    GR2.addActionListener(actionListener);
+	    GR3.addActionListener(actionListener);
+	    XR1.addActionListener(actionListener);
+	    XR2.addActionListener(actionListener);
+	    XR3.addActionListener(actionListener);
+	    PCbutton.addActionListener(actionListener);
+	    MRA.addActionListener(actionListener);
+	    MRB.addActionListener(actionListener);
+	    //Actions
+	    octInput.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				String binText = input.getText();
+				int octal = Integer.parseInt(binText);
+				
+				binText = Integer.toBinaryString(octal);
+				
+				binInput.setText(binText);
+			}
+	    	
+	    });
 	    
 	    compute = new Compution(frame);
 	  }
@@ -250,11 +333,19 @@ public class Simulator extends Frame {
 	  }
 	  public void step(String index, String value) 
 	  {
-			int val = Integer.parseInt(value);
-			//Have to complete parsing the binary files and adding the to respective spots 
-			if() {
-				
-			}
+		  int val = Integer.parseInt(value);
+		  int opcode = val >> 8;
+		  opcode = opcode & 64512;
+		  int r = (val >> 8) & 3;
+		  int ix = (val >> 6) & 3;
+		  int i = (val >> 5) & 1;
+		  int adr = val & 31;
+		  
+		  String r_str = Integer.toOctalString(r);
+		  
+		
+		  //Have to complete parsing the binary files and adding the to respective spots 
+		  
 			
 	  }
 	  
