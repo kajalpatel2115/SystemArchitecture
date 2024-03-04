@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.io.*;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Simulator extends Frame {
@@ -20,18 +21,28 @@ public class Simulator extends Frame {
 	public File selected;
 	public BufferedReader buffer;
 	public boolean halt = false;
+	public Timer timer;
+	public JFrame frame;
+	public JPanel panel;
+	public JPanel panelr0;
+	public JPanel panelr1;
+	public JPanel panelr2;
+	public JPanel panelr3;
+	public JPanel panel_pc;
+	public JPanel panel_mar;
+	public JPanel panel_mbr;
 	 
 	  //Constructor
 	  public Simulator(){
 		  ActionListener actionListener;
 		  
 		  //JFrame and JPanel set up
-		  JFrame frame = new JFrame("CSCI6461 Front Panel");
+		  frame = new JFrame("CSCI6461 Front Panel");
 		  frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	      frame.setSize(800, 800);
 	      frame.setVisible(true);
 	      frame.setBackground(Color.lightGray);
-	      JPanel panel = new JPanel();
+	      panel = new JPanel();
 	      panel.setSize(800, 100);
 	      panel.setBackground(Color.cyan);
 	      frame.add(panel, BorderLayout.SOUTH);
@@ -93,7 +104,7 @@ public class Simulator extends Frame {
 	      
 	    //Adding Registers to the Panel
 	    Box rBox = Box.createVerticalBox();
-        JPanel panelr0 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelr0 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelr0.setBackground(Color.lightGray);
         frame.add(panelr0, BorderLayout.LINE_START);
         
@@ -109,7 +120,7 @@ public class Simulator extends Frame {
 	    rBox.add(panelr0);
 	    
 	    //General Purpose Register 1
-	    JPanel panelr1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    panelr1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelr1.setBackground(Color.lightGray);
 	    GRegister1 = new JTextField("000000000000");
 	    GRegister1.setBackground(Color.WHITE);
@@ -121,7 +132,7 @@ public class Simulator extends Frame {
 	    rBox.add(panelr1);
 	    
 	    //General Purpose Register 2
-	    JPanel panelr2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    panelr2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelr2.setBackground(Color.lightGray);
 	    GRegister2 = new JTextField("000000000000");
 	    GRegister2.setBackground(Color.WHITE);
@@ -133,7 +144,7 @@ public class Simulator extends Frame {
 	    rBox.add(panelr2);
 	    
 	    //General Purpose Register 3
-	    JPanel panelr3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    panelr3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelr3.setBackground(Color.lightGray);
 	    GRegister3 = new JTextField("00000000");
 	    GRegister3.setBackground(Color.WHITE);
@@ -174,7 +185,7 @@ public class Simulator extends Frame {
 	    
 	    //Adding the PC Input Display
         Box pBox = Box.createVerticalBox();
-        JPanel panel_pc = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panel_pc = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         panel_pc.setBackground(Color.lightGray);
 	    PCinput = new JTextField("00000000");
 	    PCinput.setBackground(Color.WHITE);
@@ -186,7 +197,7 @@ public class Simulator extends Frame {
         pBox.add(panel_pc);
 	    
 	    //Adding the MAR Input Display
-        JPanel panel_mar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panel_mar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         panel_mar.setBackground(Color.lightGray);
 	    MARinput = new JTextField("00000000");
 	    MARinput.setBackground(Color.WHITE);
@@ -198,7 +209,7 @@ public class Simulator extends Frame {
         pBox.add(panel_mar);
 	    
 	    //Adding the MBR Input Display
-        JPanel panel_mbr = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panel_mbr = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         panel_mbr.setBackground(Color.lightGray);
 	    MBRinput = new JTextField("0000000000000000");
 	    MBRinput.setBackground(Color.WHITE);
@@ -285,7 +296,7 @@ public class Simulator extends Frame {
 				
 				//Adding the Octal Input into the Binary TextField
 				String binText = input.getText();
-				int octal = Integer.parseInt(binText);
+				int octal = Integer.parseInt(binText,8);
 				
 				binText = Integer.toBinaryString(octal);
 				
@@ -353,8 +364,7 @@ public class Simulator extends Frame {
 						buffer = new BufferedReader(new FileReader(selected));
 					}
 				}catch(Exception exception) {
-					
-				}
+					System.out.print("Problem");			}
 				
 				String str = null;
 				try {
@@ -368,7 +378,26 @@ public class Simulator extends Frame {
 				//Performing the Step Action for the first line
 				str = str.trim();
 				String [] arr = str.split("\\s+");
-				step(arr[0],arr[1]);
+				int octInd = Integer.parseInt(arr[0],8);
+				String binInd = Integer.toBinaryString(octInd);
+				int octVal = Integer.parseInt(arr[1],8);
+				String binVal = Integer.toBinaryString(octVal);
+				step(binInd,binVal);
+				
+				while(str != null) {
+					arr = str.split("\\s+");
+					octInd = Integer.parseInt(arr[0],8);
+					binInd = Integer.toBinaryString(octInd);
+					octVal = Integer.parseInt(arr[1],8);
+					binVal = Integer.toBinaryString(octVal);
+					compute.store(binInd,binVal);
+					try {
+						str = buffer.readLine();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
 				
 			}
 	    	
@@ -408,7 +437,9 @@ public class Simulator extends Frame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String str = null;
+				String pc = PCinput.getText();
+				step(pc, compute.load(pc));
+				/*
 				try {
 					str = buffer.readLine();
 				} catch (IOException e1) {
@@ -423,6 +454,19 @@ public class Simulator extends Frame {
 					String [] arr = str.split("\\s+");
 					step(arr[0],arr[1]);
 				}
+				
+				while(str != null) {
+					str = str.trim();
+					String [] arr = str.split("\\s+");
+					compute.store(arr[0],arr[1]);
+					try {
+						str = buffer.readLine();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				*/
 				
 				
 				
@@ -441,79 +485,6 @@ public class Simulator extends Frame {
 	    new Simulator();
 	  }
 	  
-	  public static void IPLaction()
-	  {
-		  System.out.println("IDK");
-	  }
-	  
-	  public static void PCload()
-	  {
-		  PC++;
-		  System.out.println("PC: " + PC);
-	  }
-	  
-	  public static void MARload(String input)
-	  {
-		  int in = Integer.parseInt(input);
-		  System.out.println("MAR: " + in);
-	  }
-	  
-	  public static void MBRload(String input)
-	  {
-		  int in = Integer.parseInt(input);
-		  System.out.println("MBR: " + in);
-	  }
-	  
-	  public static void runAssembler() throws IOException
-	  {
-		  output = new FileReader("./output.txt");
-		  
-		  System.out.println("Running ...");
-		  BufferedReader br = new BufferedReader(output);
-		  String str;
-		  while ((str = br.readLine()) != null){
-			  System.out.println(str);
-		  }
-		  System.out.println("DONE");
-	  }
-	  
-	  public static void HaltAssembler()
-	  {
-		  System.out.println("HALT");
-	  }
-	  
-	  public static void STEPAssembler()
-	  {
-		  System.out.println("STEP");
-	  }
-	  
-	  public static void loadAssembler()
-	  {
-		  System.out.println("load");
-	  }
-	  
-	  public static void storeAssembler()
-	  {
-		  System.out.println("store");
-	  }
-	  
-	  public static void GPRprocess(String input, int register)
-	  {
-		  int in = Integer.parseInt(input);
-		  System.out.println("GRPprocess: " + in);
-	  }
-	  
-	  public static void XRprocess(String input, int register)
-	  {
-		  int in = Integer.parseInt(input);
-		  System.out.println("XRPprocess: " + in);
-	  }
-	  
-	  public static void processInput(String input)
-	  {
-		  int in = Integer.parseInt(input);
-		  System.out.println("Input: " + in);
-	  }
 	  
 	  //Load instruction for General Purpose Register
 	  public void ldr(String value) {
@@ -603,15 +574,17 @@ public class Simulator extends Frame {
 	  //Step Function for Input Files
 	  public void step(String index, String value) 
 	  {
-		  int octInd = Integer.parseInt(index, 8);
-		  int octVal = Integer.parseInt(value, 8);
+		  //int octInd = Integer.parseInt(index, 8);
+		  //int octVal = Integer.parseInt(value, 8);
+		  int octInd = Integer.parseInt(index, 2);
+		  int octVal = Integer.parseInt(value, 2);
 		  index = Integer.toBinaryString(octInd);
 		  value = Integer.toBinaryString(octVal);
 		  
 		  //Stores address and instruction into Memory
 		  compute.store(index, value);
 		  
-		  PCinput.setText(index);
+		  //PCinput.setText(index);
 		  MARinput.setText(index);
 		  MBRinput.setText(value);
 		  
@@ -621,6 +594,8 @@ public class Simulator extends Frame {
 		  String op = Integer.toString(opcode);
 		  opcode = Integer.parseInt(op,8);
 		  switch(opcode) {
+		  	case 0:
+		  		halt = true;
 		  	case 1:
 		  		ldr(value);
 		  		break;
@@ -641,27 +616,40 @@ public class Simulator extends Frame {
 			
 	  }
 	  
+	  //Performs the run method
 	  public void run() throws Exception {
-		  
+		  //Makes sure the code starts
+		  halt = false;
+		  //Gets the Program Counter
+		  String pc = PCinput.getText();
+		  step(pc, compute.load(pc));
+		  int pcNum = Integer.parseInt(pc,2);
+		  //Loops through until a Halt is reached
+		  while(halt != true) {
+			  System.out.println("Looping");
+			  pcNum += 1;
+			  pc = Integer.toBinaryString(pcNum);
+			  PCinput.setText(pc);
+			  step(pc, compute.load(pc));
+		  }
+	  /*
+	  try {
+			str = buffer.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+  		while ((str != null) && (halt == false)) {
+          	str = str.trim();
+  			String [] arr = str.split("\\s+");
+  			step(arr[0], arr[1]);
+  			str = buffer.readLine();
+  	        repaint();
+  			//Thread.sleep(1000);
+  			
+  		}
+		*/
 		
-		new Thread(new Runnable() {
-
-	        @Override
-	        public void run() {
-	        	String str = null;
-				try {
-					str = buffer.readLine();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	    		while ((str != null) && (halt == false)) {
-	            	str = str.trim();
-	    			String [] arr = str.split("\\s+");
-	    			step(arr[0], arr[1]);
-	    		}
-	        }
-	    }).start();
 	  }
 	  
 	  
