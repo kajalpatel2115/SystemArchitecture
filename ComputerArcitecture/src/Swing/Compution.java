@@ -1,18 +1,22 @@
 package Swing;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Stack;
 
 import javax.swing.*;
 //Purpose: Supporter class to the Simulator where memory is handled,
 //and addressing is performed.
 public class Compution {
 
-	public JFrame frame;
+	//public JFrame frame;
 	//HashMap represents our memory
 	HashMap<String, String> steps = new HashMap<String, String>();
-	//Load/Store Opcode values
-	public Compution(JFrame j) {
-		frame = j;
+	//Cache variable 
+	Stack<Cache> cache = new Stack<Cache>();
+	public Compution() {
+		//frame = j;
+		steps.put("cc","0000");
 	}
 	
 	//Loads a value from memory 
@@ -72,5 +76,34 @@ public class Compution {
 	
 	public HashMap<String, String> memory(){
 		return steps;
+	}
+	
+	public void cacheProcessor(String input, String value) {
+		
+		int octal = Integer.parseInt(input, 8);
+		int tag = octal >> 2;
+		int blockNum = octal & 3;
+		Iterator<Cache> cacheIt = cache.iterator();
+		String cacheBlock = "";
+		
+		
+		while (cacheIt.hasNext()) { 
+			Cache currCache = cacheIt.next();
+            cacheBlock = currCache.getTag();
+            if(cacheBlock == Integer.toString(tag)) {
+            	String[]blocks = currCache.getBlockNum();
+            	if(blocks[blockNum] == "") {
+            		blocks[blockNum] = value;
+            	} else {
+            		System.out.println("Data Found in Cache!!");
+            	}
+            	return;
+            }
+        } 
+		if (cache.size() >= 16) {
+			cache.pop();
+		}
+		
+		cache.push(new Cache(input));
 	}
 }

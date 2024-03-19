@@ -34,6 +34,7 @@ public class Simulator extends Frame {
 	public JPanel panel_pc;
 	public JPanel panel_mar;
 	public JPanel panel_mbr;
+	public Instructions instruct = new Instructions();
 	 
 	  //Constructor
 	  public Simulator(){
@@ -285,7 +286,7 @@ public class Simulator extends Frame {
 	    MBR.addActionListener(actionListener);
 	    
 	    //Compute Object 
-	    compute = new Compution(frame);
+	    compute = new Compution();
 	    
 	    //Adding Action Listener for the Enter Button
 	    octInput.addActionListener(new ActionListener() {
@@ -455,6 +456,7 @@ public class Simulator extends Frame {
 	    new Simulator();
 	  }
 	  
+	  /*
 	  
 	  //Load instruction for General Purpose Register
 	  public void ldr(String value) {
@@ -541,6 +543,67 @@ public class Simulator extends Frame {
 		  
 	  }
 	  
+	  public void jz(String value) {
+		  String result = compute.register(value);
+		  String cc = compute.load("cc");
+		  int cond = Integer.parseInt(cc, 2);
+		  cond = cond & 1;
+		  
+		  if(cond == 0) {
+			  String pc = PCinput.getText();
+			  int pcBin = Integer.parseInt(pc, 2);
+			  pcBin += 1;
+			  pc = Integer.toBinaryString(pcBin);
+			  step(pc, compute.load(pc));
+			  
+		  } else if(cond == 1) {
+			  step(result, compute.load(result));
+		  }
+	  }
+	  
+	  public void jne(String value) {
+		  String result = compute.register(value);
+		  String cc = compute.load("cc");
+		  int cond = Integer.parseInt(cc, 2);
+		  cond = cond & 1;
+		  
+		  if(cond == 1) {
+			  String pc = PCinput.getText();
+			  int pcBin = Integer.parseInt(pc, 2);
+			  pcBin += 1;
+			  pc = Integer.toBinaryString(pcBin);
+			  step(pc, compute.load(pc));
+			  
+		  } else if(cond == 1) {
+			  step(result, compute.load(result));
+		  }
+	  }
+	  
+	  public void jcc(String value) {
+		  String result = compute.register(value);
+		  
+		  int val = Integer.parseInt(value,2);
+		  int r = (val >> 8) & 3;
+		  
+		  String cc = compute.load("cc");
+		  int ccBin = Integer.parseInt(cc,2);
+		  int[]ccBit = {ccBin & 8, ccBin & 4, ccBin & 2, ccBin & 1};
+		  
+		  if(ccBit[r] != 0) {
+			  step(result, compute.load(result));
+		  } else {
+			  String pc = PCinput.getText();
+			  int pcBin = Integer.parseInt(pc, 2);
+			  pcBin += 1;
+			  pc = Integer.toBinaryString(pcBin);
+			  step(pc, compute.load(pc));
+		  }
+	  }
+	  
+	  public void jma(String value) {
+		  String result = compute.register(value);
+		  step(result, compute.load(result));
+	  }
 	  //Set CCE
 	  public void setcee(String value) {
 		  int val = Integer.parseInt(value,2);
@@ -552,17 +615,26 @@ public class Simulator extends Frame {
 		  //Convert String binary into Decimal
 		  int regDec = Integer.parseInt(regBin, 2);
 		  
+		  String cc = compute.load("cc");
+		  int cond = Integer.parseInt(cc, 2);
 		  //Setting CCE
 		  if(regDec == 0) {
-			  compute.store(gr[r], "000001");
+			  int result = cond | 1;
+			  cc = Integer.toBinaryString(result);
+			  compute.store("cc", cc);
 		  }else {
-			  compute.store(gr[r], "000000");
+			  int result = cond & 0;
+			  cc = Integer.toBinaryString(result);
+			  compute.store("cc", cc);
 		  }
 	  }
+	  
+	  */
 	  
 	  //Step Function for Input Files
 	  public void step(String index, String value) 
 	  {
+		  
 		  int octInd = Integer.parseInt(index, 2);
 		  int octVal = Integer.parseInt(value, 2);
 		  index = Integer.toBinaryString(octInd);
@@ -584,19 +656,19 @@ public class Simulator extends Frame {
 		  	case 0:
 		  		halt = true;
 		  	case 1:
-		  		ldr(value);
+		  		instruct.ldr(value, GRegister0, GRegister1, GRegister2, GRegister3);
 		  		break;
 		  	case 2:
-		  		str(value);
+		  		instruct.str(value);
 		  		break;
 		  	case 3:
-		  		lda(value);
+		  		instruct.lda(value, XRegister1, XRegister2, XRegister3);
 		  		break;
 		  	case 4:
-		  		ldx(value);
+		  		instruct.ldx(value, XRegister1, XRegister2, XRegister3);
 		  		break;
 		  	case 5:
-		  		stx(value);
+		  		instruct.stx(value);
 		  		break;
 		  }
 		  

@@ -3,20 +3,23 @@ package Swing;
 import java.util.Stack;
 
 public class Cache {
-	int tag;
-	String data;
-	Stack<Cache> cache = new Stack<Cache>();
+	String tag;
+	String[] blockNum = {"0","0","0","0"};
 	
-	public Cache(int tag, String data) {
+	
+	public Cache(String tag) {
 		this.tag = tag;
-		this.data = data;
 	}
 	
-	public int  getTag() {
+	public String  getTag() {
 		return tag;
 	}
 	
-	public String getData() {
-		return data;
+	public String[] getBlockNum() {
+		return blockNum;
+	}
+	
+	public void setBlockNum(String [] blockNum) {
+		this.blockNum =  blockNum;
 	}
 }
