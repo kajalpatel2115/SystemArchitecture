@@ -3,11 +3,16 @@ package simulator;
 import simulator.util.NumeralConvert;
 import javax.lang.model.type.NullType;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.function.Consumer;
 
 
@@ -70,6 +75,9 @@ public class FrontPanel extends JFrame {
     private JTextField outputTextField;
     private JPanel pnlCacheField;
     private JTextField cacheTextField;
+    
+    private File selected;
+    private BufferedReader buffer;
 
     public class Pair<T, U> {
         private T first;
@@ -330,6 +338,32 @@ public class FrontPanel extends JFrame {
             public void mousePressed(MouseEvent e) {
                 registers.init();
                 System.out.println("IPL");
+                try {
+					
+					//Code for User Selected Input txt file
+					JFileChooser fileChooser = new JFileChooser();
+					FileNameExtensionFilter filter = new FileNameExtensionFilter("Instruction File", "txt");
+					fileChooser.setFileFilter(filter);
+					fileChooser.setCurrentDirectory(new File("."));
+					
+					int result = fileChooser.showOpenDialog(null);
+					
+					//Buffer Reader for the Input File
+					if(result == JFileChooser.APPROVE_OPTION) {
+						selected = fileChooser.getSelectedFile();
+						buffer = new BufferedReader(new FileReader(selected));
+					}
+				}catch(Exception exception) {
+					System.out.print("Problem");			}
+				
+				String str = null;
+				try {
+					str = buffer.readLine();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					System.out.println("Done");
+					return;
+				}
                 //printConsole("X1 is set to: " + value);
             }
         });
