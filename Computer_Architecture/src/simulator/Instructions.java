@@ -117,7 +117,64 @@ public class Instructions {
 			  registers.setCC(cc & 14);   
 		  }
 	  }
-///NEEDS to BE TESTED 
+ ///NEEDS to BE TESTED 
+	  public void AMR(String instruction, int register)
+	  {
+		  int x = StringUtil.binaryToDecimal(instruction.substring(11, 16));
+		  
+		  int result = registers.getRnByNum(register);
+		  result = result + registers.setMAR(x);
+		  registers.setRnByNum(register, result);
+		  registers.increasePCByOne();
+	  }
+	  public void SMR()
+	  {
+		  int x = StringUtil.binaryToDecimal(instruction.substring(11, 16));
+		  
+		  int result = registers.getRnByNum(register);
+		  result = result - registers.setMAR(x);
+		  registers.setRnByNum(register, result);
+		  registers.increasePCByOne();
+	  }
+	  public void AIR(String instruction, int register)
+	  {
+		  int im = StringUtil.binaryToDecimal(instruction.substring(11, 16));
+		  if(im != 0)
+		  {
+			  int regx = registers.getRnByNum(register);
+			  if(regx == 0)
+			  {
+				  registers.setRnByNum(register, (im));
+			  }
+			  else
+			  {
+				  regx = regx + im;
+				  registers.setRnByNum(register, regx);
+			  }
+		  }
+		  registers.increasePCByOne();
+	  }
+	  public void SIR(String instruciton, int register)
+	  {
+		  int im = StringUtil.binaryToDecimal(instruction.substring(11, 16));
+		  if(im != 0)
+		  {
+			  int regx = registers.getRnByNum(register);
+			  if(regx == 0)
+			  {
+				  registers.setRnByNum(register, (-im));
+			  }
+			  else
+			  {
+				  regx = regx - im;
+				  registers.setRnByNum(register, regx);
+			  }
+		  }
+		  registers.increasePCByOne();
+	  }
+	  
+	  
+	  
 	  //Using the register number the DVD function gets the number in the register and divides
 	  public void DVD(int regist1, int regist2)
 	  {
