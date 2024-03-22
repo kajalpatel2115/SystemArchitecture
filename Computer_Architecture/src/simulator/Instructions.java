@@ -217,7 +217,7 @@ public class Instructions {
 		  registers.increasePCByOne();
 	  }
 	  
-	  public void AND(int regist1, int regist2)
+	  /*public void AND(int regist1, int regist2)
 	  {
 		  int regx = registers.getRnByNum(regist1);
 		  int regy = registers.getRnByNum(regist2);
@@ -225,6 +225,7 @@ public class Instructions {
 		  registers.setRnByNum(regist1, result);
 		  registers.increasePCByOne();
 	  }
+   		//Tara: the not function need to limit the length of binary string.
 	  public void NOT(int regist1)
 	  {
 		  int regx = registers.getRnByNum(regist1);
@@ -255,6 +256,96 @@ public class Instructions {
 		  registers.increasePCByOne();
 	  }
 	  
-	  
+	  public void dvd(int value) {
+		int rx = (value >> 7) & 3;
+		int ry = (value >> 5) & 3;
+		if (rx >=3 || ry >= 3) {
+			// TODO: throw exceptions
+			return;
+		}
+		int register1 = registers.getRnByNum(rx);
+		int register2 = registers.getRnByNum(ry);
+		if (register2 == 0){
+			int cc = registers.getCC();
+			registers.setCC(cc | 2);
+			return;
+		}
+		int quotient = register1 / register2;
+		int remainder = register1 % register2;
+		registers.setRnByNum(rx,quotient);
+		registers.setRnByNum((rx+1), remainder);
+
+	}
+
+	public void trr(int value) {
+		int rx = (value >> 7) & 3;
+		int ry = (value >> 5) & 3;
+		int register1 = registers.getRnByNum(rx);
+		int register2 = registers.getRnByNum(ry);
+		int cc = registers.getCC();
+		if (register1 == register2) {
+			registers.setCC(cc | 1);
+		} else {
+			registers.setCC((cc | 1) - 1);
+		}
+	}*/
+
+	public void dvd(int value) {
+		int rx = (value >> 7) & 3;
+		int ry = (value >> 5) & 3;
+		if (rx >=3 || ry >= 3) {
+			// TODO: throw exceptions
+			return;
+		}
+		int register1 = registers.getRnByNum(rx);
+		int register2 = registers.getRnByNum(ry);
+		if (register2 == 0){
+			int cc = registers.getCC();
+			registers.setCC(cc | 2);
+			return;
+		}
+		int quotient = register1 / register2;
+		int remainder = register1 % register2;
+		registers.setRnByNum(rx,quotient);
+		registers.setRnByNum((rx+1), remainder);
+
+	}
+
+	public void trr(int value) {
+		int rx = (value >> 7) & 3;
+		int ry = (value >> 5) & 3;
+		int register1 = registers.getRnByNum(rx);
+		int register2 = registers.getRnByNum(ry);
+		int cc = registers.getCC();
+		if (register1 == register2) {
+			registers.setCC(cc | 1);
+		} else {
+			registers.setCC((cc | 1) - 1);
+		}
+	}
+
+	public void and(int value) {
+		int rx = (value >> 7) & 3;
+		int ry = (value >> 5) & 3;
+		int register1 = registers.getRnByNum(rx);
+		int register2 = registers.getRnByNum(ry);
+
+		registers.setRnByNum(rx, register1 & register2);
+	}
+
+	public void orr(int value) {
+		int rx = (value >> 7) & 3;
+		int ry = (value >> 5) & 3;
+		int register1 = registers.getRnByNum(rx);
+		int register2 = registers.getRnByNum(ry);
+
+		registers.setRnByNum(rx, register1 | register2);
+	}
+
+	public void not(int value) {
+		int rx = (value >> 7) & 3;
+		int register1 = registers.getRnByNum(rx);
+		registers.setRnByNum(rx, (~register1) & 0xFFFF);
+	}
 	  
 }
