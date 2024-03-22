@@ -347,5 +347,67 @@ public class Instructions {
 		int register1 = registers.getRnByNum(rx);
 		registers.setRnByNum(rx, (~register1) & 0xFFFF);
 	}
-	  
+//Added code from here 
+ public void jsr(int value) {
+        int ix = (value >> 8) & 3;
+        int address = exactAddress(value);
+
+        // Save the return address (PC + 1) in R3
+        registers.setR3(registers.getPC() + 1);
+
+        // Set the Program Counter (PC) to the effective address
+        registers.setPC(address);
+    }
+    public void rfs(int value) {
+        int immed = (value >> 11) & 31; // Extract the immediate value from the instruction
+
+        // Set R0 to the immediate value
+        registers.setR0(immed);
+
+        // Set PC to the value stored in R3
+        registers.setPC(registers.getR3());
+    }
+
+    public void sob(int value) {
+        int r = (value >> 6) & 3;
+        int ix = (value >> 8) & 3;
+        int i = (value >> 10) & 1;
+        int address = (value >> 11) & 31;
+
+        int effectiveAddress = EffectiveAddress.calculateEA(ix, address, i, memory, registers);
+
+        // Decrement register value
+        int currRegValue = registers.getRnByNum(r);
+        registers.setRnByNum(r, currRegValue - 1);
+
+        // Check if the decremented value is greater than 0
+        if (currRegValue > 0) {
+            // Jump to effective address
+            registers.setPC(effectiveAddress);
+        } else {
+            // Continue to the next instruction
+            registers.increasePCByOne();
+        }
+
+    }
+
+    public void jge(int value) {
+        int r = (value >> 6) & 3;
+        int ix = (value >> 8) & 3;
+        int i = (value >> 10) & 1;
+        int address = (value >> 11) & 31;
+
+        int effectiveAddress = EffectiveAddress.calculateEA(ix, address, i, memory, registers);
+
+        // Check if the value in the specified register is greater than or equal to 0
+        if (registers.getRnByNum(r) >= 0) {
+            // Jump to the effective address
+            registers.setPC(effectiveAddress);
+        } else {
+            // Continue to the next instruction
+            registers.increasePCByOne();
+        }
+    }
+
+	
 }
